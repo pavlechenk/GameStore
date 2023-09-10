@@ -1,11 +1,10 @@
 from django.shortcuts import render
-
-# Create your views here.
+from games.models import Game, GameGenres
 
 
 def index(requests):
     context = {
-        'title': 'Store'
+        'title': 'Game Store'
     }
 
     return render(requests, 'games/index.html', context)
@@ -13,7 +12,9 @@ def index(requests):
 
 def games(requests):
     context = {
-        'title': 'Store - Каталог'
+        'title': 'Game Store - Каталог',
+        'games': Game.objects.all(),
+        'genres': GameGenres.objects.all(),
     }
 
     return render(requests, 'games/games.html', context)
