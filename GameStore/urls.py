@@ -14,8 +14,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from games.views import index, games
+from django.urls import path, include
+from games.views import index
 from django.conf.urls.static import static
 from django.conf import settings
 
@@ -23,7 +23,7 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index, name='index'),
-    path('games/', games, name='games'),
+    path('games/', include('games.urls', namespace='games')),
 ]
 
 if settings.DEBUG:
