@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index, name='index'),
     path('games/', include('games.urls', namespace='games')),
+    path('users/', include('users.urls', namespace='users')),
 ]
 
 if settings.DEBUG:
