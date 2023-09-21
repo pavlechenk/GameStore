@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponseRedirect
-from users.forms import UserLoginForm, UserRegistrationForm
+from users.forms import UserLoginForm, UserRegistrationForm, UserProfileForm
 from django.contrib import auth
 from django.urls import reverse
 
@@ -38,3 +38,20 @@ def registration(requests):
     }
 
     return render(requests, 'users/registration.html', context)
+
+
+def profile(requests):
+    if requests.method == 'POST':
+        form = UserProfileForm(instance=requests.user, data=requests.POST, files=requests.FILES)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('users:profile'))
+    else:
+        form = UserProfileForm(instance=requests.user)
+
+    context = {
+        'title': 'Game Store - Профиль',
+        'form': form
+    }
+
+    return render(requests, 'users/profile.html', context)
