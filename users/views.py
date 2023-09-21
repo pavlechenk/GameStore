@@ -56,3 +56,8 @@ def profile(requests):
     }
 
     return render(requests, 'users/profile.html', context)
+
+
+def logout(requests):
+    auth.logout(requests)
+    return HttpResponseRedirect(reverse('index'))
