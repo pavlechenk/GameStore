@@ -2,6 +2,7 @@ from django.shortcuts import render, HttpResponseRedirect
 from users.forms import UserLoginForm, UserRegistrationForm, UserProfileForm
 from django.contrib import auth, messages
 from django.urls import reverse
+from games.models import Basket
 
 
 def login(requests):
@@ -52,7 +53,8 @@ def profile(requests):
 
     context = {
         'title': 'Game Store - Профиль',
-        'form': form
+        'form': form,
+        'baskets': Basket.objects.filter(user=requests.user),
     }
 
     return render(requests, 'users/profile.html', context)
