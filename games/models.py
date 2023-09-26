@@ -22,11 +22,27 @@ class Game(models.Model):
         return f"Игра: {self.name} | Жанр: {self.genre}"
 
 
+class BasketQuerySet(models.QuerySet):
+    def get_total_price(self):
+        return sum([basket.get_price() for basket in self])
+
+    def get_total_quantity(self):
+        return sum([basket.quantity for basket in self])
+
+
 class Basket(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
     game = models.ForeignKey(to=Game, on_delete=models.CASCADE)
     quantity = models.PositiveSmallIntegerField(default=0)
     created_timestamp = models.DateTimeField(auto_now_add=True)
 
+    objects = BasketQuerySet.as_manager()
+
     def __str__(self):
         return f"Корзина для {self.user.username} | Продукт: {self.game.name}"
+
+    def get_price(self):
+        return self.game.price * self.quantity
+
+
+
