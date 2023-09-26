@@ -1,5 +1,6 @@
 from django.shortcuts import render, HttpResponseRedirect
 from games.models import Game, GameGenres, Basket
+from django.contrib.auth.decorators import login_required
 
 
 def index(requests):
@@ -20,6 +21,7 @@ def games(requests):
     return render(requests, 'games/games.html', context)
 
 
+@login_required
 def basket_add(requests, game_id):
     game = Game.objects.get(id=game_id)
     baskets = Basket.objects.filter(user=requests.user, game=game)
@@ -34,6 +36,7 @@ def basket_add(requests, game_id):
     return HttpResponseRedirect(requests.META['HTTP_REFERER'])
 
 
+@login_required
 def basket_remove(requests, basket_id):
     Basket.objects.get(id=basket_id).delete()
     return HttpResponseRedirect(requests.META['HTTP_REFERER'])

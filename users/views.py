@@ -3,6 +3,7 @@ from users.forms import UserLoginForm, UserRegistrationForm, UserProfileForm
 from django.contrib import auth, messages
 from django.urls import reverse
 from games.models import Basket
+from django.contrib.auth.decorators import login_required
 
 
 def login(requests):
@@ -42,6 +43,7 @@ def registration(requests):
     return render(requests, 'users/registration.html', context)
 
 
+@login_required
 def profile(requests):
     if requests.method == 'POST':
         form = UserProfileForm(instance=requests.user, data=requests.POST, files=requests.FILES)
