@@ -11,10 +11,10 @@ def index(requests):
     return render(requests, 'games/index.html', context)
 
 
-def games(requests):
+def games(requests, genre_id=None):
     context = {
-        'title': 'Game Store - Каталог',
-        'games': Game.objects.all(),
+        'title': 'GameStore - Каталог',
+        'games': Game.objects.filter(genre_id=genre_id) if genre_id else Game.objects.all(),
         'genres': GameGenres.objects.all(),
     }
 

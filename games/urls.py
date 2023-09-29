@@ -5,6 +5,7 @@ app_name = 'games'
 
 urlpatterns = [
     path('', games, name='index'),
+    path('genre/<int:genre_id>', games, name='genre'),
     path('baskets/add/<int:game_id>', basket_add, name='basket_add'),
     path('baskets/remove/<int:basket_id>', basket_remove, name='basket_remove'),
 ]
