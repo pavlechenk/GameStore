@@ -1,20 +1,27 @@
 from django.shortcuts import render, HttpResponseRedirect
 from games.models import Game, GameGenres, Basket
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 
 
 def index(requests):
     context = {
-        'title': 'Game Store'
+        'title': 'GameStore'
     }
 
     return render(requests, 'games/index.html', context)
 
 
-def games(requests, genre_id=None):
+def games(requests, genre_id=None, page_number=1):
+    games = Game.objects.filter(genre_id=genre_id) if genre_id else Game.objects.all()
+
+    per_page = 3
+    paginator = Paginator(games, per_page)
+    games_paginator = paginator.page(page_number)
+
     context = {
         'title': 'GameStore - Каталог',
-        'games': Game.objects.filter(genre_id=genre_id) if genre_id else Game.objects.all(),
+        'games': games_paginator,
         'genres': GameGenres.objects.all(),
     }
 
