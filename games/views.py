@@ -51,5 +51,3 @@ def basket_add(requests, game_id):
 def basket_remove(requests, basket_id):
     Basket.objects.get(id=basket_id).delete()
     return HttpResponseRedirect(requests.META['HTTP_REFERER'])
-
-

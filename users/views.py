@@ -1,9 +1,10 @@
 from django.shortcuts import render, HttpResponseRedirect
 from users.forms import UserLoginForm, UserRegistrationForm, UserProfileForm
-from django.contrib import auth, messages
-from django.urls import reverse
+from django.contrib import auth
+from django.urls import reverse, reverse_lazy
 from games.models import Basket
-from django.contrib.auth.decorators import login_required
+from django.views.generic.edit import CreateView, UpdateView
+from users.models import User
 
 
 def login(requests):
@@ -20,46 +21,38 @@ def login(requests):
         form = UserLoginForm()
 
     context = {
+        'title': 'GameStore - Авторизация',
         'form': form,
     }
 
     return render(requests, 'users/login.html', context)
 
 
-def registration(requests):
-    if requests.method == 'POST':
-        form = UserRegistrationForm(data=requests.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(requests, 'Вы успешно зарегестрировались!')
-            return HttpResponseRedirect(reverse('users:login'))
-    else:
-        form = UserRegistrationForm()
+class UserRegistrationView(CreateView):
+    model = User
+    form_class = UserRegistrationForm
+    template_name = 'users/registration.html'
+    success_url = reverse_lazy('users:login')
 
-    context = {
-        'form': form,
-    }
-
-    return render(requests, 'users/registration.html', context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['title'] = 'GameStore - Регистрация'
+        return context
 
 
-@login_required
-def profile(requests):
-    if requests.method == 'POST':
-        form = UserProfileForm(instance=requests.user, data=requests.POST, files=requests.FILES)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse('users:profile'))
-    else:
-        form = UserProfileForm(instance=requests.user)
+class UserProfileView(UpdateView):
+    model = User
+    form_class = UserProfileForm
+    template_name = 'users/profile.html'
 
-    context = {
-        'title': 'Game Store - Профиль',
-        'form': form,
-        'baskets': Basket.objects.filter(user=requests.user),
-    }
+    def get_success_url(self):
+        return reverse_lazy('users:profile', args=(self.object.id,))
 
-    return render(requests, 'users/profile.html', context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['title'] = 'GameStore - Личный Кабинет'
+        context['baskets'] = Basket.objects.filter(user=self.object)
+        return context
 
 
 def logout(requests):
