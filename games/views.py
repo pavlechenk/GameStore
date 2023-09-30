@@ -1,31 +1,35 @@
-from django.shortcuts import render, HttpResponseRedirect
+from django.shortcuts import HttpResponseRedirect
 from games.models import Game, GameGenres, Basket
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
+from django.views.generic.base import TemplateView
+from django.views.generic.list import ListView
 
 
-def index(requests):
-    context = {
-        'title': 'GameStore'
-    }
+class IndexView(TemplateView):
+    template_name = 'games/index.html'
 
-    return render(requests, 'games/index.html', context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['title'] = 'GameStore'
+        return context
 
 
-def games(requests, genre_id=None, page_number=1):
-    games = Game.objects.filter(genre_id=genre_id) if genre_id else Game.objects.all()
+class GamesListView(ListView):
+    model = Game
+    template_name = 'games/games.html'
+    context_object_name = 'games'
+    paginate_by = 3
 
-    per_page = 3
-    paginator = Paginator(games, per_page)
-    games_paginator = paginator.page(page_number)
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        genre_id = self.kwargs.get('genre_id')
+        return queryset.filter(genre_id=genre_id) if genre_id else queryset
 
-    context = {
-        'title': 'GameStore - Каталог',
-        'games': games_paginator,
-        'genres': GameGenres.objects.all(),
-    }
-
-    return render(requests, 'games/games.html', context)
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data()
+        context['title'] = 'GameStore - Каталог'
+        context['genres'] = GameGenres.objects.all()
+        return context
 
 
 @login_required

@@ -15,14 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from games.views import index
+from games.views import IndexView
 from django.conf.urls.static import static
 from django.conf import settings
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', index, name='index'),
+    path('', IndexView.as_view(), name='index'),
     path('games/', include('games.urls', namespace='games')),
     path('users/', include('users.urls', namespace='users')),
 ]
