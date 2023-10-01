@@ -3,22 +3,20 @@ from games.models import Game, GameGenres, Basket
 from django.contrib.auth.decorators import login_required
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
+from common.views import TitleMixin
 
 
-class IndexView(TemplateView):
+class IndexView(TitleMixin, TemplateView):
     template_name = 'games/index.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-        context['title'] = 'GameStore'
-        return context
+    title = 'GameStore'
 
 
-class GamesListView(ListView):
+class GamesListView(TitleMixin, ListView):
     model = Game
     template_name = 'games/games.html'
     context_object_name = 'games'
     paginate_by = 3
+    title = 'GameStore - Каталог'
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -27,7 +25,6 @@ class GamesListView(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data()
-        context['title'] = 'GameStore - Каталог'
         context['genres'] = GameGenres.objects.all()
         return context
 
