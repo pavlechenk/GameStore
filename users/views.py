@@ -1,38 +1,28 @@
-from django.shortcuts import render, HttpResponseRedirect
 from users.forms import UserLoginForm, UserRegistrationForm, UserProfileForm
-from django.contrib import auth
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 from games.models import Basket
 from django.views.generic.edit import CreateView, UpdateView
 from users.models import User
+from django.contrib.auth.views import LoginView
+from django.contrib.messages.views import SuccessMessageMixin
 
 
-def login(requests):
-    if requests.method == 'POST':
-        form = UserLoginForm(data=requests.POST)
-        if form.is_valid():
-            username = requests.POST['username']
-            password = requests.POST['password']
-            user = auth.authenticate(username=username, password=password)
-            if user:
-                auth.login(requests, user)
-                return HttpResponseRedirect(reverse('index'))
-    else:
-        form = UserLoginForm()
+class UserLoginView(LoginView):
+    template_name = 'users/login.html'
+    form_class = UserLoginForm
 
-    context = {
-        'title': 'GameStore - Авторизация',
-        'form': form,
-    }
-
-    return render(requests, 'users/login.html', context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context['title'] = 'GameStore - Авторизация'
+        return context
 
 
-class UserRegistrationView(CreateView):
+class UserRegistrationView(SuccessMessageMixin, CreateView):
     model = User
     form_class = UserRegistrationForm
     template_name = 'users/registration.html'
     success_url = reverse_lazy('users:login')
+    success_message = "Вы успешно зарегистрировались!"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
@@ -53,8 +43,3 @@ class UserProfileView(UpdateView):
         context['title'] = 'GameStore - Личный Кабинет'
         context['baskets'] = Basket.objects.filter(user=self.object)
         return context
-
-
-def logout(requests):
-    auth.logout(requests)
-    return HttpResponseRedirect(reverse('index'))
