@@ -43,3 +43,12 @@ class UserProfileForm(UserChangeForm):
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'image', 'username', 'email')
+
+
+class UserChangePasswordForm(forms.Form):
+    current_password = forms.CharField(widget=forms.PasswordInput(attrs={
+        'class': 'form-control py-4', 'placeholder': 'Введите текущий пароль'}))
+    new_password1 = forms.CharField(widget=forms.PasswordInput(attrs={
+        'class': 'form-control py-4', 'placeholder': 'Введите новый пароль'}))
+    new_password2 = forms.CharField(widget=forms.PasswordInput(attrs={
+        'class': 'form-control py-4', 'placeholder': 'Повторите новый пароль'}))
