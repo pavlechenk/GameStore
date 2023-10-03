@@ -1,8 +1,10 @@
 from users.forms import UserLoginForm, UserRegistrationForm, UserProfileForm, UserChangePasswordForm
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from games.models import Basket
+from django.http import HttpResponseRedirect
 from django.views.generic.edit import CreateView, UpdateView, FormView
-from users.models import User
+from django.views.generic.base import TemplateView
+from users.models import User, EmailVerification
 from django.contrib.auth.views import LoginView
 from django.contrib.messages.views import SuccessMessageMixin
 from common.views import TitleMixin
@@ -37,6 +39,22 @@ class UserProfileView(TitleMixin, UpdateView):
         context = super().get_context_data()
         context['baskets'] = Basket.objects.filter(user=self.object)
         return context
+
+
+class EmailVerificationView(TitleMixin, TemplateView):
+    title = 'GameStore - Подтверждение электронной почты'
+    template_name = 'users/email_verification.html'
+
+    def get(self, request, *args, **kwargs):
+        code = kwargs['code']
+        user = User.objects.get(email=kwargs['email'])
+        email_verification = EmailVerification.objects.filter(user=user, code=code)
+        if email_verification.exists() and not email_verification.last().is_expired():
+            user.is_verified_email = True
+            user.save()
+            return super().get(request, *args, **kwargs)
+
+        return HttpResponseRedirect(reverse('index'))
 
 
 class UserChangePasswordView(TitleMixin, SuccessMessageMixin, FormView):

@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+DOMAIN_NAME = 'http://127.0.0.1:8000'
+
 
 # Application definition
 
@@ -141,3 +143,11 @@ LOGIN_URL = '/users/login'
 LOGIN_REDIRECT_URL = '/'
 
 LOGOUT_REDIRECT_URL = '/'
+
+# Email
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'storegame857@gmail.com'
+EMAIL_HOST_PASSWORD = 'gxfhpmcdqjqhiijn'
+EMAIL_USE_TLS = True
