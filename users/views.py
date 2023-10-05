@@ -1,14 +1,15 @@
-from users.forms import UserLoginForm, UserRegistrationForm, UserProfileForm, UserChangePasswordForm
-from django.urls import reverse_lazy, reverse
-from games.models import Basket
-from django.http import HttpResponseRedirect
-from django.views.generic.edit import CreateView, UpdateView, FormView
-from django.views.generic.base import TemplateView
-from users.models import User, EmailVerification
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.views import LoginView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.http import HttpResponseRedirect
+from django.urls import reverse, reverse_lazy
+from django.views.generic.base import TemplateView
+from django.views.generic.edit import CreateView, FormView, UpdateView
+
 from common.views import TitleMixin
-from django.contrib.auth import update_session_auth_hash
+from users.forms import (UserChangePasswordForm, UserLoginForm,
+                         UserProfileForm, UserRegistrationForm)
+from users.models import EmailVerification, User
 
 
 class UserLoginView(TitleMixin, LoginView):

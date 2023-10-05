@@ -1,4 +1,5 @@
 from django.db import models
+
 from users.models import User
 
 
@@ -43,6 +44,3 @@ class Basket(models.Model):
 
     def get_price(self):
         return self.game.price * self.quantity
-
-
-

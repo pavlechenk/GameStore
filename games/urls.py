@@ -1,4 +1,5 @@
 from django.urls import path
+
 from games.views import GamesListView, basket_add, basket_remove
 
 app_name = 'games'
