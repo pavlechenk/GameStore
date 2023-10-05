@@ -1,5 +1,6 @@
 from django.urls import path
-from users.views import UserLoginView, UserRegistrationView, UserProfileView, UserChangePasswordView, EmailVerificationView
+from users.views import UserLoginView, UserRegistrationView, UserProfileView, UserChangePasswordView
+from users.views import EmailVerificationView
 from django.contrib.auth.views import LogoutView
 from django.contrib.auth.decorators import login_required
 
