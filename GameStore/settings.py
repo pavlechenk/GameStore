@@ -91,16 +91,6 @@ CACHES = {
     }
 }
 
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -179,3 +169,7 @@ EMAIL_HOST_USER = 'storegame857@gmail.com'
 EMAIL_HOST_PASSWORD = 'gxfhpmcdqjqhiijn'
 EMAIL_USE_TLS = True
 
+# Celery
+
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
