@@ -1,5 +1,6 @@
 {% extends 'games/base.html' %}
 {% load static %}
+{% load cache %}
 
 
 {% block css %}
@@ -56,30 +57,31 @@
                 </div>
 
                 <div class="row">
-                    {% for game in games %}
-                        <div class="col-lg-4 col-md-6 mb-4">
-                            <div class="card h-100">
-                                <a href="#">
-                                    <img class="card-img-top"
-                                         src="{{ game.image.url }}"
-                                         alt="">
-                                </a>
-                                <div class="card-body">
-                                    <h4 class="card-title">
-                                        <a href="#">{{ game.name }}</a>
-                                    </h4>
-                                    <h5>{{ game.price }} руб.</h5>
-                                    <p class="card-text">{{ game.description }}</p>
-                                </div>
-                                <div class="card-footer text-center">
-                                    <a class="btn btn-outline-success" href="{% url 'games:basket_add' game.id %}">
-                                        Отправить в корзину
+                    {% cache 30 games %}
+                        {% for game in games %}
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <a href="#">
+                                        <img class="card-img-top"
+                                             src="{{ game.image.url }}"
+                                             alt="">
                                     </a>
+                                    <div class="card-body">
+                                        <h4 class="card-title">
+                                            <a href="#">{{ game.name }}</a>
+                                        </h4>
+                                        <h5>{{ game.price }} руб.</h5>
+                                        <p class="card-text">{{ game.description }}</p>
+                                    </div>
+                                    <div class="card-footer text-center">
+                                        <a class="btn btn-outline-success" href="{% url 'games:basket_add' game.id %}">
+                                            Отправить в корзину
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    {% endfor %}
-
+                        {% endfor %}
+                    {% endcache %}
                 </div>
 
             {% if is_paginated %}
