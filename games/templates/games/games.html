@@ -1,6 +1,5 @@
 {% extends 'games/base.html' %}
-{% load static %}
-{% load cache %}
+{% load static cache humanize %}
 
 
 {% block css %}
@@ -70,7 +69,7 @@
                                         <h4 class="card-title">
                                             <a href="#">{{ game.name }}</a>
                                         </h4>
-                                        <h5>{{ game.price }} руб.</h5>
+                                        <h5>{{ game.price| intcomma }} руб.</h5>
                                         <p class="card-text">{{ game.description }}</p>
                                     </div>
                                     <div class="card-footer text-center">
