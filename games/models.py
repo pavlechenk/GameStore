@@ -64,3 +64,13 @@ class Basket(models.Model):
 
     def get_price(self):
         return self.game.price * self.quantity
+
+    def de_json(self):
+        baskets_item = {
+            'game_name': self.game.name,
+            'quantity': self.quantity,
+            'price': float(self.game.price),
+            'sum': float(self.get_price()),
+        }
+
+        return baskets_item

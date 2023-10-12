@@ -10,6 +10,7 @@ from games.models import Basket
 from orders.forms import OrderForm
 from django.views.decorators.csrf import csrf_exempt
 
+from orders.models import Order
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -76,6 +77,7 @@ def stripe_webhook_view(request):
 
 
 def fulfill_order(session):
-    # TODO: fill me in
     order_id = int(session.metadata.order_id)
-    print("Fulfilling order")
+    print(f'order_id - {order_id}')
+    order = Order.objects.get(id=order_id)
+    order.update_after_payment()
