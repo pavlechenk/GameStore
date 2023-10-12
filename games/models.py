@@ -11,6 +11,10 @@ class GameGenres(models.Model):
     name = models.CharField(max_length=128, unique=True)
     description = models.TextField(null=True, blank=True)
 
+    class Meta:
+        verbose_name = 'GameGenre'
+        verbose_name_plural = 'GameGenres'
+
     def __str__(self):
         return self.name
 
@@ -23,6 +27,10 @@ class Game(models.Model):
     image = models.ImageField(upload_to='games_images')
     stripe_game_price_id = models.CharField(max_length=128, null=True, blank=True)
     genre = models.ForeignKey(to=GameGenres, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = 'Game'
+        verbose_name_plural = 'Games'
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if not self.stripe_game_price_id:
