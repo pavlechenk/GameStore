@@ -1,15 +1,17 @@
-import stripe
-from django.http import HttpResponseRedirect, HttpResponse
 from http import HTTPStatus
-from django.urls import reverse_lazy, reverse
-from django.views.generic.edit import CreateView
-from django.views.generic.base import TemplateView
+
+import stripe
 from django.conf import settings
+from django.http import HttpResponse, HttpResponseRedirect
+from django.urls import reverse, reverse_lazy
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic.base import TemplateView
+from django.views.generic.edit import CreateView
+from django.views.generic.list import ListView
+
 from common.views import TitleMixin
 from games.models import Basket
 from orders.forms import OrderForm
-from django.views.decorators.csrf import csrf_exempt
-
 from orders.models import Order
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -24,6 +26,18 @@ class CanceledTemplateView(TemplateView):
     template_name = 'orders/canceled.html'
 
 
+class OrderListView(TitleMixin, ListView):
+    title = 'GameStore - Заказы'
+    template_name = 'orders/orders.html'
+    model = Order
+    context_object_name = 'orders'
+    ordering = ('-created',)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(initiator=self.request.user)
+
+
 class OrderCreateView(TitleMixin, CreateView):
     title = 'GameStore - Оформление заказа'
     template_name = 'orders/order_create.html'
@@ -31,6 +45,10 @@ class OrderCreateView(TitleMixin, CreateView):
     success_url = reverse_lazy('orders:order_create')
 
     def post(self, request, *args, **kwargs):
+        orders = Order.objects.filter(initiator=self.request.user, status=0)
+        if orders.exists():
+            orders.delete()
+
         super(OrderCreateView, self).post(request, *args, **kwargs)
         baskets = Basket.objects.filter(user=self.request.user)
         checkout_session = stripe.checkout.Session.create(
@@ -58,10 +76,10 @@ def stripe_webhook_view(request):
         event = stripe.Webhook.construct_event(
             payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
         )
-    except ValueError as e:
+    except ValueError:
         # Invalid payload
         return HttpResponse(status=HTTPStatus.BAD_REQUEST)
-    except stripe.error.SignatureVerificationError as e:
+    except stripe.error.SignatureVerificationError:
         # Invalid signature
         return HttpResponse(status=HTTPStatus.BAD_REQUEST)
 
