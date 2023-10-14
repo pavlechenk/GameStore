@@ -8,6 +8,7 @@ urlpatterns = [
     path('', GamesListView.as_view(), name='index'),
     path('genre/<int:genre_id>', GamesListView.as_view(), name='genre'),
     path('page/<int:page>', GamesListView.as_view(), name='paginator'),
+    path('genre/<int:genre_id>/page/<int:page>', GamesListView.as_view(), name='genre_pagination'),
     path('baskets/add/<int:game_id>', basket_add, name='basket_add'),
     path('baskets/remove/<int:basket_id>', basket_remove, name='basket_remove'),
 ]

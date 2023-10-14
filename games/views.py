@@ -2,7 +2,6 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import HttpResponseRedirect
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
-
 from common.views import TitleMixin
 from games.models import Basket, Game, GameGenres
 
@@ -26,7 +25,9 @@ class GamesListView(TitleMixin, ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data()
+        genre_id = self.kwargs.get('genre_id')
         context['genres'] = GameGenres.objects.all()
+        context['current_genre'] = GameGenres.objects.get(pk=genre_id) if genre_id else None
         return context
 
 

@@ -56,7 +56,7 @@
                 </div>
 
                 <div class="row">
-                    {% cache 30 games %}
+                    {% cache 30 request.path games %}
                         {% for game in games %}
                             <div class="col-lg-4 col-md-6 mb-4">
                                 <div class="card h-100">
@@ -82,37 +82,45 @@
                         {% endfor %}
                     {% endcache %}
                 </div>
-
-            {% if is_paginated %}
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item  {% if not page_obj.has_previous %} disabled {% endif %}">
-                            <a class="page-link"
-                               href="{% if page_obj.has_previous %} {% url 'games:paginator' page_obj.previous_page_number %} {% else %} # {% endif %}"
-                               tabindex="-1" aria-disabled="true">
-                                Предыдущая</a>
-                        </li>
-                        {% for page in paginator.page_range %}
-                            <li class="page-item">
-                                <a class="page-link" href="{% url 'games:paginator' page %}">
-                                {{ page }}
+                {% if is_paginated %}
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item  {% if not page_obj.has_previous %} disabled {% endif %}">
+                                <a class="page-link"
+                                   href="{% if current_genre and page_obj.has_previous %}
+                                            {% url 'games:genre_pagination' current_genre.id page_obj.previous_page_number %}
+                                         {% else %}
+                                            {% if page_obj.has_previous %} {% url 'games:paginator' page_obj.previous_page_number %} {% endif %}
+                                            {% if current_genre %} # {% endif %}
+                                            {% if not current_genre and not page_obj.has_previous %} # {% endif %}
+                                        {% endif %}"
+                                   tabindex="-1" aria-disabled="true">
+                                    Предыдущая</a>
+                            </li>
+                            {% for page in paginator.page_range %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{% if current_genre %} {% url 'games:genre_pagination' current_genre.id page %} {% else %} {% url 'games:paginator' page %} {% endif %}">
+                                    {{ page }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                            <li class="page-item {% if not page_obj.has_next %} disabled {% endif %}">
+                                <a class="page-link"
+                                   href="{% if current_genre and page_obj.has_next %}
+                                            {% url 'games:genre_pagination' current_genre.id page_obj.next_page_number %}
+                                         {% else %}
+                                            {% if page_obj.has_next %} {% url 'games:paginator' page_obj.next_page_number %} {% endif %}
+                                            {% if current_genre %} # {% endif %}
+                                            {% if not current_genre and not page_obj.has_next %} # {% endif %}
+                                        {% endif %}">
+                                    Следующая
                                 </a>
                             </li>
-                        {% endfor %}
-                        <li class="page-item {% if not page_obj.has_next %} disabled {% endif %}">
-                            <a class="page-link"
-                               href="{% if page_obj.has_next %} {% url 'games:paginator' page_obj.next_page_number %} {% else %} # {% endif %}">
-                                Следующая
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            {% endif %}
-
+                        </ul>
+                    </nav>
+                {% endif %}
             </div>
-
         </div>
-
     </div>
     <!-- /.container -->
 {% endblock %}

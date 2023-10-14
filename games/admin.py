@@ -13,8 +13,8 @@ class GameAdmin(admin.ModelAdmin):
 
 @admin.register(GameGenres)
 class GameGenresAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name')
-    fields = ('id', 'name', 'description')
+    list_display = ('name',)
+    fields = ('name', 'description')
     search_fields = ('name',)
     ordering = ('name',)
 
