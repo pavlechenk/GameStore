@@ -1,11 +1,14 @@
 from datetime import timedelta
 from http import HTTPStatus
 
+from celery import Celery
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.timezone import now
 
 from users.models import EmailVerification, User
+
+app = Celery('users')
 
 
 class UserLoginViewTestCase(TestCase):
@@ -16,6 +19,11 @@ class UserLoginViewTestCase(TestCase):
             password='testpassword'
         )
         self.path = reverse('users:login')
+
+        app.conf.task_always_eager = True
+        app.conf.task_eager_propagates = True
+        app.conf.result_backend = 'cache'
+        app.conf.result_cache_max = 100
 
     def test_user_login_get(self):
         response = self.client.get(self.path)
