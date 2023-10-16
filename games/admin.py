@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from games.models import Game, GameGenres, Basket
+from games.models import Basket, Game, GameGenres
 
 
 @admin.register(Game)
