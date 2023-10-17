@@ -67,7 +67,7 @@ ___
 
 ## Лицензия
 
-Этот проект лицензируется в соответствии с [лицензией MIT](https://en.wikipedia.org/wiki/MIT_License). Подробности см. в файле [LICENSE](https://github.com/pavlechenk/GameStore/blob/master/LICENSE).
+Этот проект лицензируется в соответствии с [лицензией MIT](https://en.wikipedia.org/wiki/MIT_License). Подробности см. в файле [LICENSE](https://github.com/pavlechenk/GameStore/blob/main/LICENSE.txt).
 
 ___
 
