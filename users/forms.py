@@ -1,6 +1,6 @@
 from django import forms
-from django.contrib.auth.forms import (AuthenticationForm, UserChangeForm,
-                                       UserCreationForm)
+from django.contrib.auth.forms import (AuthenticationForm, PasswordResetForm,
+                                       UserChangeForm, UserCreationForm)
 
 from users.models import User
 from users.tasks import send_email_verification
@@ -58,6 +58,11 @@ class UserResetPasswordForm(forms.Form):
         'class': 'form-control py-4', 'placeholder': 'Введите новый пароль'}))
     new_password2 = forms.CharField(widget=forms.PasswordInput(attrs={
         'class': 'form-control py-4', 'placeholder': 'Повторите новый пароль'}))
+
+
+class UserEmailForgotPasswordForm(PasswordResetForm):
+    email = forms.CharField(widget=forms.EmailInput(attrs={
+        'class': 'form-control py-4', 'placeholder': 'Введите адрес эл. почты'}))
 
 
 class UserChangePasswordForm(forms.Form):
