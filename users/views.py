@@ -23,8 +23,12 @@ class UserRegistrationView(TitleMixin, SuccessMessageMixin, CreateView):
     form_class = UserRegistrationForm
     template_name = 'users/registration.html'
     success_url = reverse_lazy('users:login')
-    success_message = "Вы успешно зарегистрировались! Вам на почту отправлено сообщения для подтверждения аккаунта."
     title = 'GameStore - Регистрация'
+
+    def get_success_message(self, cleaned_data):
+        user = User.objects.get(id=self.object.id)
+        return f"Вы успешно зарегистрировались! На почту {user.email}" \
+               " отправлено сообщения для подтверждения аккаунта."
 
 
 class UserProfileView(TitleMixin, UpdateView):
