@@ -1,9 +1,10 @@
 from django import forms
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import (AuthenticationForm, PasswordResetForm,
                                        UserChangeForm, UserCreationForm)
 
-from users.models import User
-from users.tasks import send_email_verification
+from users.models import EmailResetPassword, User
+from users.tasks import send_email_reset_password, send_email_verification
 
 
 class UserLoginForm(AuthenticationForm):
@@ -59,10 +60,38 @@ class UserResetPasswordForm(forms.Form):
     new_password2 = forms.CharField(widget=forms.PasswordInput(attrs={
         'class': 'form-control py-4', 'placeholder': 'Повторите новый пароль'}))
 
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password1 = cleaned_data.get("new_password1")
+        new_password2 = cleaned_data.get("new_password2")
+
+        if new_password1 != new_password2:
+            self.add_error('new_password2', 'Новые пароли не совпадают')
+
+    def save(self, request, email, code):
+        user = User.objects.get(email=email)
+        new_password = self.cleaned_data.get("new_password1")
+
+        user.set_password(new_password)
+        user.save()
+        update_session_auth_hash(request, user)
+
+        email_reset_password = EmailResetPassword.objects.get(code=code)
+        email_reset_password.reset_expiration()
+
 
 class UserEmailForgotPasswordForm(PasswordResetForm):
     email = forms.CharField(widget=forms.EmailInput(attrs={
         'class': 'form-control py-4', 'placeholder': 'Введите адрес эл. почты'}))
+
+    def clean(self):
+        cleaned_data = super().clean()
+        email = cleaned_data.get("email")
+        try:
+            user = User.objects.get(email=email)
+            send_email_reset_password(user.id)
+        except User.DoesNotExist:
+            self.add_error('email', 'Пользователь с указанным email не зарегистрирован')
 
 
 class UserChangePasswordForm(forms.Form):

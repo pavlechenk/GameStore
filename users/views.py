@@ -86,20 +86,9 @@ class UserResetPasswordView(TitleMixin, FormView):
         return HttpResponseRedirect(reverse('index'))
 
     def form_valid(self, form):
-        new_password1 = form.cleaned_data.get("new_password1")
-        new_password2 = form.cleaned_data.get("new_password2")
-        user = User.objects.get(email=self.kwargs.get('email'))
-
-        if new_password1 != new_password2:
-            form.add_error('new_password2', 'Новые пароли не совпадают')
-            return self.form_invalid(form)
-
-        user.set_password(new_password1)
-        user.save()
-        update_session_auth_hash(self.request, user)
-
-        email_reset_password = EmailResetPassword.objects.get(code=self.kwargs.get('code'))
-        email_reset_password.reset_expiration()
+        email = self.kwargs.get('email')
+        code = self.kwargs.get('code')
+        form.save(self.request, email, code)
 
         return super().form_valid(form)
 
@@ -114,14 +103,6 @@ class UserForgotPasswordView(TitleMixin, SuccessMessageMixin, FormView):
         return f'Сообщение было успешно отправлено на почту {cleaned_data.get("email")}'
 
     def form_valid(self, form):
-        email = form.cleaned_data.get("email")
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            form.add_error('email', 'Пользователь с указанным email не зарегистрирован')
-            return self.form_invalid(form)
-
-        send_email_reset_password.delay(user.id)
         return super().form_valid(form)
 
 
