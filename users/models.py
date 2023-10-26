@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.mail import send_mail
@@ -18,11 +20,6 @@ class BaseEmailSending(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     expiration = models.DateTimeField()
 
-    def __init__(self, subject, message):
-        super().__init__()
-        self.subject = subject
-        self.message = message
-
     def send_email(self):
         send_mail(
             subject=self.subject,
@@ -32,22 +29,33 @@ class BaseEmailSending(models.Model):
             fail_silently=False,
         )
 
-    def is_expired(self):
-        return True if now() >= self.expiration else False
-
     def _get_full_link(self, view_name):
         url = reverse(view_name, args=(self.user.email, self.code))
         full_link = f"{settings.DOMAIN_NAME}{url}"
         return full_link
 
+    def set_email_message(self, subject, message):
+        self.subject = subject
+        self.message = message
+
+    def is_expired(self):
+        return True if now() >= self.expiration else False
+
+    def reset_expiration(self):
+        self.expiration = self.created
+        self.save()
+
 
 class EmailVerification(BaseEmailSending):
-    def __init__(self):
+
+    def send_email(self):
         subject = f"Подтверждение учетной записи для {self.user.username}"
         message = "Для подтверждения учетной записи для {} перейдите по ссылке {}".format(
             self.user.email, self._get_full_link('users:email_verification')
         )
-        super().__init__(subject, message)
+
+        super().set_email_message(subject, message)
+        super().send_email()
 
     def __str__(self):
         return f"EmailVerification object for {self.user.email}"
@@ -55,12 +63,14 @@ class EmailVerification(BaseEmailSending):
 
 class EmailResetPassword(BaseEmailSending):
 
-    def __init__(self):
+    def send_email(self):
         subject = f"Сброс пароля учетной записи {self.user.username}"
         message = "Для сброса пароля учетной записи {} перейдите по ссылке {}".format(
             self.user.email, self._get_full_link('users:reset_password')
         )
-        super().__init__(subject, message)
+
+        super().set_email_message(subject, message)
+        super().send_email()
 
     def __str__(self):
         return f"EmailResetPassword object for {self.user.email}"
