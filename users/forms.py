@@ -89,7 +89,7 @@ class UserEmailForgotPasswordForm(PasswordResetForm):
         email = cleaned_data.get("email")
         try:
             user = User.objects.get(email=email)
-            send_email_reset_password(user.id)
+            send_email_reset_password.delay(user.id)
         except User.DoesNotExist:
             self.add_error('email', 'Пользователь с указанным email не зарегистрирован')
 
