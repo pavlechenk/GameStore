@@ -7,9 +7,11 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
 
 from common.views import TitleMixin
-from users.forms import (UserChangePasswordForm, UserLoginForm,
-                         UserProfileForm, UserRegistrationForm)
-from users.models import EmailVerification, User
+from users.forms import (UserChangePasswordForm, UserEmailForgotPasswordForm,
+                         UserLoginForm, UserProfileForm, UserRegistrationForm,
+                         UserResetPasswordForm)
+from users.models import EmailResetPassword, EmailVerification, User
+from users.tasks import send_email_reset_password
 
 
 class UserLoginView(TitleMixin, LoginView):
@@ -42,8 +44,8 @@ class UserProfileView(TitleMixin, UpdateView):
 
 
 class EmailVerificationView(TitleMixin, TemplateView):
-    title = 'GameStore - Подтверждение электронной почты'
     template_name = 'users/email_verification.html'
+    title = 'GameStore - Подтверждение электронной почты'
 
     def get(self, request, *args, **kwargs):
         code = kwargs['code']
@@ -57,10 +59,76 @@ class EmailVerificationView(TitleMixin, TemplateView):
         return HttpResponseRedirect(reverse('index'))
 
 
+class PasswordResetSuccessfullyView(TitleMixin, TemplateView):
+    template_name = 'users/password_reset_successfully.html'
+    title = 'GameStore - Пароль успешно сброшен'
+
+
+class UserResetPasswordView(TitleMixin, FormView):
+    form_class = UserResetPasswordForm
+    success_url = reverse_lazy('users:password_reset_successfully')
+    template_name = 'users/reset_password.html'
+    title = 'GameStore - Сброс пароля'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['email'] = self.kwargs.get('email')
+        context['code'] = self.kwargs.get('code')
+        return context
+
+    def get(self, request, *args, **kwargs):
+        code = kwargs['code']
+        user = User.objects.get(email=kwargs['email'])
+        email_reset_password = EmailResetPassword.objects.filter(user=user, code=code).first()
+        if email_reset_password and not email_reset_password.is_expired():
+            return super().get(request, *args, **kwargs)
+
+        return HttpResponseRedirect(reverse('index'))
+
+    def form_valid(self, form):
+        new_password1 = form.cleaned_data.get("new_password1")
+        new_password2 = form.cleaned_data.get("new_password2")
+        user = User.objects.get(email=self.kwargs.get('email'))
+
+        if new_password1 != new_password2:
+            form.add_error('new_password2', 'Новые пароли не совпадают')
+            return self.form_invalid(form)
+
+        user.set_password(new_password1)
+        user.save()
+        update_session_auth_hash(self.request, user)
+
+        email_reset_password = EmailResetPassword.objects.get(code=self.kwargs.get('code'))
+        email_reset_password.reset_expiration()
+
+        return super().form_valid(form)
+
+
+class UserForgotPasswordView(TitleMixin, SuccessMessageMixin, FormView):
+    form_class = UserEmailForgotPasswordForm
+    template_name = 'users/forgot_password.html'
+    success_url = reverse_lazy('users:login')
+    title = 'GameStore - Сброс пароля'
+
+    def get_success_message(self, cleaned_data):
+        return f'Сообщение было успешно отправлено на почту {cleaned_data.get("email")}'
+
+    def form_valid(self, form):
+        email = form.cleaned_data.get("email")
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            form.add_error('email', 'Пользователь с указанным email не зарегистрирован')
+            return self.form_invalid(form)
+
+        send_email_reset_password.delay(user.id)
+        return super().form_valid(form)
+
+
 class UserChangePasswordView(TitleMixin, SuccessMessageMixin, FormView):
-    template_name = 'users/change_password.html'
     form_class = UserChangePasswordForm
     success_message = 'Вы успешно сменили пароль!'
+    template_name = 'users/change_password.html'
     title = 'GameStore - Смена пароля'
 
     def get_success_url(self):
@@ -73,11 +141,11 @@ class UserChangePasswordView(TitleMixin, SuccessMessageMixin, FormView):
         user = self.request.user
 
         if not user.check_password(current_password):
-            form.add_error('current_password', 'Текущий пароль введен неверно')
+            form.add_error("current_password", "Текущий пароль введен неверно")
             return self.form_invalid(form)
 
         if new_password1 != new_password2:
-            form.add_error('new_password2', 'Новые пароли не совпадают')
+            form.add_error("new_password2", "Новые пароли не совпадают")
             return self.form_invalid(form)
 
         user.set_password(new_password1)
