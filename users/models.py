@@ -20,6 +20,10 @@ class BaseEmailSending(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     expiration = models.DateTimeField()
 
+    class Meta:
+        verbose_name = 'Электронное письмо'
+        verbose_name_plural = 'Электронные письма'
+
     def send_email(self):
         send_mail(
             subject=self.subject,

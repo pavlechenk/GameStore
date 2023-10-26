@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from games.admin import BasketAdmin
-from users.models import EmailVerification, User
+from users.models import BaseEmailSending, User
 
 
 @admin.register(User)
@@ -10,8 +10,8 @@ class UserAdmin(admin.ModelAdmin):
     inlines = (BasketAdmin,)
 
 
-@admin.register(EmailVerification)
-class EmailVerificationAdmin(admin.ModelAdmin):
+@admin.register(BaseEmailSending)
+class EmailSendingAdmin(admin.ModelAdmin):
     list_display = ('code', 'user', 'expiration')
     fields = ('code', 'user', 'expiration', 'created')
     readonly_fields = ('created',)
