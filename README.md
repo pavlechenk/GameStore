@@ -46,20 +46,28 @@ ___
         python manage.py makemigrations
         python manage.py migrate
    
-6. Запустите Celery для асинхронной обработки задач:
+7. Загрузите фикстуры:
+
+        python manage.py loaddata games/fixtures/genres.json # Для Linux/Mac
+        python manage.py loaddata games/fixtures/games.json     
+
+        python -Xutf8 manage.py loaddata games/fixtures/genres.json # Для Windows
+        python -Xutf8 manage.py loaddata games/fixtures/games.json
+   
+9. Запустите Celery для асинхронной обработки задач:
 
         celery -A GameStore worker -l INFO
 
-7. Запустите webhook для Windows, используя stripe.exe:
+10. Запустите webhook для Windows, используя stripe.exe:
    
         stripe.exe webhook setup --listen-to http://127.0.0.1:8000/webhook/stripe  
         Инструкция по установке stripe - https://stripe.com/docs/payments/checkout/fulfill-orders#go-live
 
-8. Запустите сервер разработки:
+11. Запустите сервер разработки:
    
         python manage.py runserver
 
-9. Откройте веб-браузер и перейдите по указанному ниже адресу для доступа к интернет-магазину:
+12. Откройте веб-браузер и перейдите по указанному ниже адресу для доступа к интернет-магазину:
 
         http://127.0.0.1:8000/
 
