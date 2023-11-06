@@ -28,6 +28,7 @@ urlpatterns = [
     path('users/', include('users.urls', namespace='users')),
     path('orders/', include('orders.urls', namespace='orders')),
     path('webhock/stripe/', stripe_webhook_view, name='webhook_stripe'),
+    path('api/', include('api.urls', namespace='api')),
 ]
 
 if settings.DEBUG:
