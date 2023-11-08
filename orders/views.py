@@ -107,6 +107,5 @@ def stripe_webhook_view(request):
 
 def fulfill_order(session):
     order_id = int(session.metadata.order_id)
-    print(f'order_id - {order_id}')
     order = Order.objects.get(id=order_id)
     order.update_after_payment()

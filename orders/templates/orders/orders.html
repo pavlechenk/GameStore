@@ -15,7 +15,7 @@
                     <table class="table">
                         <thead>
                         <tr class="table-light">
-                            <th scope="col">#</th>
+                            <th scope="col">№</th>
                             <th scope="col">Статус</th>
                             <th scope="col">Создан</th>
                             <th scope="col">Итого</th>
@@ -28,7 +28,7 @@
                                 <th scope="row">{{ order.id }}</th>
                                 <td>{{ order.get_status_display }}</td>
                                 <td>{{ order.created|naturaltime }}</td>
-                                <td>{% if order.basket_history %} {{ order.basket_history.total_sum|intcomma }} {% else %} {{ baskets.get_total_price }} {% endif %} руб.</td>
+                                <td>{% if order.basket_history %} {{ order.basket_history.total_sum|intcomma }} {% else %} {{ baskets.total_price }} {% endif %} руб.</td>
                                 <td>
                                     <a href="{% url 'orders:order' order.id %}">просмотреть</a>
                                 </td>

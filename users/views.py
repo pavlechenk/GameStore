@@ -11,7 +11,6 @@ from users.forms import (UserChangePasswordForm, UserEmailForgotPasswordForm,
                          UserLoginForm, UserProfileForm, UserRegistrationForm,
                          UserResetPasswordForm)
 from users.models import EmailResetPassword, EmailVerification, User
-from users.tasks import send_email_reset_password
 
 
 class UserLoginView(TitleMixin, LoginView):

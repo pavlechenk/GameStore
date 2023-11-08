@@ -49,10 +49,10 @@ class Game(models.Model):
 
 
 class BasketQuerySet(models.QuerySet):
-    def get_total_price(self):
-        return sum([basket.get_price() for basket in self])
+    def total_price(self):
+        return sum([basket.sum() for basket in self])
 
-    def get_total_quantity(self):
+    def total_quantity(self):
         return sum([basket.quantity for basket in self])
 
     def stripe_games(self):
@@ -70,7 +70,7 @@ class Basket(models.Model):
     def __str__(self):
         return f"Корзина для {self.user.username} | Продукт: {self.game.name}"
 
-    def get_price(self):
+    def sum(self):
         return self.game.price * self.quantity
 
     def de_json(self):
@@ -78,7 +78,7 @@ class Basket(models.Model):
             'game_name': self.game.name,
             'quantity': self.quantity,
             'price': float(self.game.price),
-            'sum': float(self.get_price()),
+            'sum': float(self.sum()),
         }
 
         return baskets_item
