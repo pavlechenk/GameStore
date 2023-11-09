@@ -1,8 +1,8 @@
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
-from games.models import Game
-from games.serializers import GameSerializer
+from games.models import Game, Basket
+from games.serializers import GameSerializer, BasketSerializer
 
 
 class GameModelViewSet(ModelViewSet):
@@ -14,3 +14,14 @@ class GameModelViewSet(ModelViewSet):
             self.permission_classes = (IsAdminUser,)
 
         return super().get_permissions()
+
+
+class BasketModelViewSet(ModelViewSet):
+    queryset = Basket.objects.all()
+    serializer_class = BasketSerializer
+    permission_classes = (IsAuthenticated,)
+    pagination_class = None
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(user=self.request.user)
