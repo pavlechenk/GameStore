@@ -24,5 +24,3 @@ class BasketAdmin(admin.TabularInline):
     fields = ('game', 'quantity', 'created_timestamp')
     readonly_fields = ('created_timestamp',)
     extra = 0
-
-

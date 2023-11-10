@@ -24,7 +24,7 @@ class Game(models.Model):
     description = models.TextField()
     price = models.DecimalField(max_digits=6, decimal_places=2)
     quantity = models.PositiveIntegerField(default=0)
-    image = models.ImageField(upload_to='games_images')
+    image = models.ImageField(upload_to='games_images', null=True, blank=True)
     stripe_game_price_id = models.CharField(max_length=128, null=True, blank=True)
     genre = models.ForeignKey(to=GameGenres, on_delete=models.CASCADE)
 
@@ -59,6 +59,18 @@ class BasketQuerySet(models.QuerySet):
         return [{'price': basket.game.stripe_game_price_id, 'quantity': basket.quantity} for basket in self]
 
 
+def basket_add(game_id, user):
+    game = Game.objects.get(id=game_id)
+    baskets = Basket.objects.filter(user=user, game=game)
+
+    if not baskets.exists():
+        Basket.objects.create(user=user, game=game, quantity=1)
+    else:
+        basket = baskets.first()
+        basket.quantity += 1
+        basket.save()
+
+
 class Basket(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.CASCADE)
     game = models.ForeignKey(to=Game, on_delete=models.CASCADE)
@@ -82,3 +94,18 @@ class Basket(models.Model):
         }
 
         return baskets_item
+
+    @staticmethod
+    def create_or_update(game_id, user):
+        baskets = Basket.objects.filter(user=user, game_id=game_id)
+
+        if not baskets.exists():
+            obj = Basket.objects.create(user=user, game_id=game_id, quantity=1)
+            is_created = True
+            return obj, is_created
+        else:
+            basket = baskets.first()
+            basket.quantity += 1
+            basket.save()
+            is_created = False
+            return basket, is_created

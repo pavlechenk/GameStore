@@ -34,16 +34,7 @@ class GamesListView(TitleMixin, ListView):
 
 @login_required
 def basket_add(requests, game_id):
-    game = Game.objects.get(id=game_id)
-    baskets = Basket.objects.filter(user=requests.user, game=game)
-
-    if not baskets.exists():
-        Basket.objects.create(user=requests.user, game=game, quantity=1)
-    else:
-        basket = baskets.first()
-        basket.quantity += 1
-        basket.save()
-
+    Basket.create_or_update(game_id, requests.user)
     return HttpResponseRedirect(requests.META['HTTP_REFERER'])
 
 
