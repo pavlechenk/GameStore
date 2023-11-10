@@ -41,12 +41,24 @@ ___
 
         pip install -r requirements.txt
 
-5. Выполните миграции базы данных:
+5. Скачайте и установите PostgreSQL с официального сайта:
+   
+       https://www.postgresql.org/download/
+   
+6. Создайте базу данных и роли в psql:
+
+       CREATE DATABASE db_name;
+       CREATE ROLE name with password 'password';
+       ALTER ROLE "name" with LOGIN;
+       GRANT ALL PRIVILEGES ON DATABESE "db_name" to name;
+       ALTER USER name CREATEDB;
+
+7. Выполните миграции базы данных:
    
         python manage.py makemigrations
         python manage.py migrate
    
-7. Загрузите фикстуры:
+8. Загрузите фикстуры:
 
         python manage.py loaddata games/fixtures/genres.json # Для Linux/Mac
         python manage.py loaddata games/fixtures/games.json     
