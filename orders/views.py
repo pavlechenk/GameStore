@@ -32,7 +32,12 @@ class OrderListView(TitleMixin, ListView):
     template_name = 'orders/orders.html'
     model = Order
     context_object_name = 'orders'
-    ordering = ('-created',)
+    ordering = ('created',)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['order_numbers'] = list(range(1, Order.objects.filter(initiator=self.request.user).count() + 1))
+        return context
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -42,6 +47,7 @@ class OrderListView(TitleMixin, ListView):
 class OrderDetailView(DetailView):
     template_name = 'orders/order.html'
     model = Order
+    context_object_name = 'order'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -56,11 +62,12 @@ class OrderCreateView(TitleMixin, CreateView):
     success_url = reverse_lazy('orders:order_create')
 
     def post(self, request, *args, **kwargs):
-        orders = Order.objects.filter(initiator=self.request.user, status=0)
+        orders = Order.objects.filter(user=self.request.user, status=0)
         if orders.exists():
             orders.delete()
 
         super(OrderCreateView, self).post(request, *args, **kwargs)
+        Order.objects.get(id=self.object.id).update_before_payment()
         baskets = Basket.objects.filter(user=self.request.user)
         checkout_session = stripe.checkout.Session.create(
             line_items=baskets.stripe_games(),
