@@ -62,10 +62,6 @@ class OrderCreateView(TitleMixin, CreateView):
     success_url = reverse_lazy('orders:order_create')
 
     def post(self, request, *args, **kwargs):
-        orders = Order.objects.filter(user=self.request.user, status=0)
-        if orders.exists():
-            orders.delete()
-
         super(OrderCreateView, self).post(request, *args, **kwargs)
         Order.objects.get(id=self.object.id).update_before_payment()
         baskets = Basket.objects.filter(user=self.request.user)

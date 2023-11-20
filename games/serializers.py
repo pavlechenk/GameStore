@@ -1,7 +1,6 @@
 from rest_framework import fields, serializers
 
 from games.models import Basket, Game, GameGenres
-from users.models import User
 
 
 class GameSerializer(serializers.ModelSerializer):
@@ -28,9 +27,3 @@ class BasketSerializer(serializers.ModelSerializer):
 
     def get_total_quantity(self, obj):
         return Basket.objects.filter(user_id=obj.user.id).total_quantity()
-
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        Model = User
-        fields = ('first_name', 'last_name', 'username', 'email', 'password')
