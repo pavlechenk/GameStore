@@ -53,12 +53,37 @@ ___
        GRANT ALL PRIVILEGES ON DATABESE "db_name" to name;
        ALTER USER name CREATEDB;
 
-7. Выполните миграции базы данных:
+7. Создайте файл .env и установите в нем значения для следующих переменных:
+
+        DEBUG=True
+        SECRET_KEY=
+        DOMAIN_NAME=http://127.0.0.1:8000
+        
+        REDIS_HOST=127.0.0.1
+        REDIS_PORT=6379
+        
+        DATABASE_NAME=
+        DATABASE_USER=
+        DATABASE_PASSWORD=
+        DATABASE_HOST=127.0.0.1
+        DATABASE_PORT=5432
+        
+        EMAIL_HOST=smtp.gmail.com
+        EMAIL_PORT=587
+        EMAIL_HOST_USER=
+        EMAIL_HOST_PASSWORD=
+        EMAIL_USE_TLS=True
+        
+        STRIPE_PUBLIC_KEY=
+        STRIPE_SECRET_KEY=
+        STRIPE_WEBHOOK_SECRET=
+
+8. Выполните миграции базы данных:
    
         python manage.py makemigrations
         python manage.py migrate
    
-8. Загрузите фикстуры:
+9. Загрузите фикстуры:
 
         python manage.py loaddata games/fixtures/genres.json # Для Linux/Mac
         python manage.py loaddata games/fixtures/games.json     
@@ -66,20 +91,24 @@ ___
         python -Xutf8 manage.py loaddata games/fixtures/genres.json # Для Windows
         python -Xutf8 manage.py loaddata games/fixtures/games.json
    
-9. Запустите Celery для асинхронной обработки задач:
+10. Запустите Celery для асинхронной обработки задач:
 
         celery -A GameStore worker -l INFO
 
-10. Запустите webhook для Windows, используя stripe.exe:
-   
-        stripe.exe webhook setup --listen-to http://127.0.0.1:8000/webhook/stripe  
-        Инструкция по установке stripe - https://stripe.com/docs/payments/checkout/fulfill-orders#go-live
+11. Зарегистрируйтесь на официальном сайте stripe и установите значения для переменных STRIPE_PUBLIC_KEY и STRIPE_SECRET_KEY в файле .env, которые можно взять из Dashboard после регистрации:
 
-11. Запустите сервер разработки:
+        Ссылка для регистрации - https://dashboard.stripe.com/register
+
+12. Запустите webhook для Windows, используя stripe.exe и сохраните полученный webhook в переменной STRIPE_WEBHOOK_SECRET файла .env:
+   
+        stripe.exe webhook setup --listen-to http://127.0.0.1:8000/webhock/stripe/ 
+        Инструкция по установке stripe - https://stripe.com/docs/payments/checkout/fulfill-orders
+
+13. Запустите сервер разработки:
    
         python manage.py runserver
 
-12. Откройте веб-браузер и перейдите по указанному ниже адресу для доступа к интернет-магазину:
+14. Откройте веб-браузер и перейдите по указанному ниже адресу для доступа к интернет-магазину:
 
         http://127.0.0.1:8000/
 
