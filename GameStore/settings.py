@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'rest_framework',
     'rest_framework.authtoken',
+    'djoser',
 
     'django_extensions',
     'debug_toolbar',

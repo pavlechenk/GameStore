@@ -16,7 +16,7 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
 from rest_framework.authtoken.views import obtain_auth_token
 
 from games.views import IndexView
@@ -30,7 +30,7 @@ urlpatterns = [
     path('orders/', include('orders.urls', namespace='orders')),
     path('webhock/stripe/', stripe_webhook_view, name='webhook_stripe'),
     path('api/', include('api.urls', namespace='api')),
-    path('api-token-auth/', obtain_auth_token)
+    re_path(r'^auth/', include('djoser.urls.authtoken'))
 ]
 
 if settings.DEBUG:
