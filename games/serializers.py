@@ -3,6 +3,12 @@ from rest_framework import fields, serializers
 from games.models import Basket, Game, GameGenres
 
 
+class GameGenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GameGenres
+        fields = ('id', 'name', 'description')
+
+
 class GameSerializer(serializers.ModelSerializer):
     genre = serializers.SlugRelatedField(slug_field='name', queryset=GameGenres.objects.all())
 

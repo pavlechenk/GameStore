@@ -5,13 +5,25 @@ from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from games.models import Basket, Game
-from games.serializers import BasketSerializer, GameSerializer
+from games.models import Basket, Game, GameGenres
+from games.serializers import BasketSerializer, GameSerializer, GameGenreSerializer
 from orders.models import Order
 from orders.serializers import OrderSerializer
 from users.models import User
 from users.serializers import UserSerializer
 from users.tasks import send_email_verification
+
+
+class GameGenreModelViewSet(ModelViewSet):
+    queryset = GameGenres.objects.all()
+    serializer_class = GameGenreSerializer
+    pagination_class = None
+
+    def get_permissions(self):
+        if self.action in ('create', 'update', 'partial_update', 'destroy'):
+            self.permission_classes = (IsAdminUser,)
+
+        return super().get_permissions()
 
 
 class GameModelViewSet(ModelViewSet):
