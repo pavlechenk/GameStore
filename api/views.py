@@ -1,7 +1,5 @@
-from django.core.exceptions import ValidationError
-from django.core.validators import validate_email
 from rest_framework import status
-from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
@@ -9,9 +7,6 @@ from games.models import Basket, Game, GameGenres
 from games.serializers import BasketSerializer, GameSerializer, GameGenreSerializer
 from orders.models import Order
 from orders.serializers import OrderSerializer
-from users.models import User
-from users.serializers import UserSerializer
-from users.tasks import send_email_verification
 
 
 class GameGenreModelViewSet(ModelViewSet):
@@ -102,50 +97,3 @@ class OrderModelViewSet(ModelViewSet):
 
         return Response({'detail': 'Добавьте товары в корзину перед созданием заказа.'},
                         status=status.HTTP_400_BAD_REQUEST)
-
-
-class UserModelViewSet(ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = (IsAuthenticated,)
-    pagination_class = None
-
-    def create(self, request, *args, **kwargs):
-        try:
-            first_name = request.data['first_name']
-            last_name = request.data['last_name']
-            username = request.data['username']
-            email = request.data['email']
-            password1 = request.data['password1']
-            password2 = request.data['password2']
-            validate_email(email)
-        except KeyError:
-            return Response({'detail': 'Вам необходимо указать следующие обязательные поля: first_name, last_name,'
-                                       ' username, email, password1, password2.'})
-        except ValidationError:
-            return Response({'detail': 'Введите правильный адрес электронной почты.'},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        if User.objects.filter(email=email).exists():
-            return Response({'detail': 'Пользователь с таким email уже существует.'},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        if password1 != password2:
-            return Response({'detail': 'Введенные пароли не совпадают.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        user = User.objects.create(first_name=first_name, last_name=last_name, username=username, email=email,
-                                   password=password1)
-
-        send_email_verification.delay(user.id)
-        user_serializers = self.get_serializer(user)
-        return Response(user_serializers.data, status=status.HTTP_201_CREATED)
-
-    def get_permissions(self):
-        if self.action == 'create':
-            self.permission_classes = (AllowAny,)
-
-        return super().get_permissions()
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        return queryset.filter(id=self.request.user.id)
