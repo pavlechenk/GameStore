@@ -98,11 +98,13 @@
                                     Предыдущая</a>
                             </li>
                             {% for page in paginator.page_range %}
-                                <li class="page-item">
-                                    <a class="page-link" href="{% if current_genre %} {% url 'games:genre_pagination' current_genre.id page %} {% else %} {% url 'games:paginator' page %} {% endif %}">
-                                    {{ page }}
-                                    </a>
-                                </li>
+                                {% if page_obj.number == page or page_obj.number|add:'-2' <= page and page <= page_obj.number|add:'2' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{% if current_genre %} {% url 'games:genre_pagination' current_genre.id page %} {% else %} {% url 'games:paginator' page %} {% endif %}">
+                                        {{ page }}
+                                        </a>
+                                    </li>
+                                {% endif %}
                             {% endfor %}
                             <li class="page-item {% if not page_obj.has_next %} disabled {% endif %}">
                                 <a class="page-link"
