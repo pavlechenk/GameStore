@@ -3,8 +3,8 @@ from django.shortcuts import HttpResponseRedirect
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
 
-from common.views import TitleMixin
-from games.models import Basket, Game, GameGenres
+from common.views import TitleMixin, GameContextMixin
+from games.models import Basket, Game
 
 
 class IndexView(TitleMixin, TemplateView):
@@ -12,7 +12,7 @@ class IndexView(TitleMixin, TemplateView):
     title = 'GameStore'
 
 
-class GamesListView(TitleMixin, ListView):
+class GamesListView(TitleMixin, GameContextMixin, ListView):
     model = Game
     template_name = 'games/games.html'
     context_object_name = 'games'
@@ -23,13 +23,6 @@ class GamesListView(TitleMixin, ListView):
         queryset = super().get_queryset()
         genre_id = self.kwargs.get('genre_id')
         return queryset.filter(genre_id=genre_id) if genre_id else queryset
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data()
-        genre_id = self.kwargs.get('genre_id')
-        context['genres'] = GameGenres.objects.all()
-        context['current_genre'] = GameGenres.objects.get(pk=genre_id) if genre_id else None
-        return context
 
 
 @login_required
