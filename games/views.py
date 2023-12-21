@@ -3,7 +3,7 @@ from django.shortcuts import HttpResponseRedirect
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
 
-from common.views import TitleMixin, GameContextMixin
+from common.views import GameContextMixin, TitleMixin
 from games.models import Basket, Game
 
 

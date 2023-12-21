@@ -1,8 +1,8 @@
 from django.urls import include, path
 from rest_framework import routers
 
-from api.views import (BasketModelViewSet, GameModelViewSet, OrderModelViewSet,
-                       GameGenreModelViewSet)
+from api.views import (BasketModelViewSet, GameGenreModelViewSet,
+                       GameModelViewSet, OrderModelViewSet)
 
 app_name = 'api'
 

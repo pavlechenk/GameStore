@@ -4,7 +4,8 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from games.models import Basket, Game, GameGenres
-from games.serializers import BasketSerializer, GameSerializer, GameGenreSerializer
+from games.serializers import (BasketSerializer, GameGenreSerializer,
+                               GameSerializer)
 from orders.models import Order
 from orders.serializers import OrderSerializer
 

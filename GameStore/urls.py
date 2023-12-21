@@ -20,8 +20,8 @@ from django.urls import include, path, re_path
 
 from games.views import IndexView
 from orders.views import stripe_webhook_view
-from .yasg import urlpatterns as do_urls
 
+from .yasg import urlpatterns as do_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
